@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TitanesDeLaOscuridad</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand" data-i18n="Titanes De La Oscuridad">Titanes De La Oscuridad</div>
+    <select id="lang-select"></select>
+  </div>
+  <div class="content">
+    <div class="panel">
+      <h2 data-i18n="Sign in">Sign in</h2>
+      <input id="user" placeholder="Username" data-i18n-placeholder="Username" />
+      <input id="pass" type="password" placeholder="Password" data-i18n-placeholder="Password" />
+      <button id="login" data-i18n="Login">Login</button>
+      <div id="login-status"></div>
+    </div>
+    <div class="panel">
+      <h2 data-i18n="Servers">Servers</h2>
+      <button id="refresh" data-i18n="Refresh">Refresh</button>
+      <ul id="servers"></ul>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
