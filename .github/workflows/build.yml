@@ -1,0 +1,51 @@
+name: build-windows-msi
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Generate icon.ico
+        shell: pwsh
+        run: |
+          $icons = "TitanesDeLaOscuridad/src-tauri/icons"
+          New-Item -ItemType Directory -Force -Path $icons | Out-Null
+          Add-Type -AssemblyName System.Drawing
+          $bmp = New-Object System.Drawing.Bitmap(32,32)
+          $g = [System.Drawing.Graphics]::FromImage($bmp)
+          $g.Clear([System.Drawing.Color]::Black)
+          $brush = [System.Drawing.Brushes]::White
+          $font = New-Object System.Drawing.Font('Segoe UI',16,[System.Drawing.FontStyle]::Bold)
+          $g.DrawString('T',$font,$brush,0,0)
+          $hicon = $bmp.GetHicon()
+          $icon = [System.Drawing.Icon]::FromHandle($hicon)
+          $fs = [System.IO.File]::Open("TitanesDeLaOscuridad/src-tauri/icons/icon.ico",[System.IO.FileMode]::Create,[System.IO.FileAccess]::Write)
+          $icon.Save($fs)
+          $fs.Close()
+      - name: Build Tauri app (Windows MSI)
+        uses: tauri-apps/tauri-action@v2
+        with:
+          projectPath: TitanesDeLaOscuridad
+      - name: Prepare fixed MSI name
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem "TitanesDeLaOscuridad/src-tauri/target/release/bundle/msi" -Filter *.msi | Select-Object -First 1
+          if ($null -eq $msi) { throw "MSI not found" }
+          Copy-Item $msi.FullName -Destination "TitanesDeLaOscuridad-setup.msi" -Force
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TitanesDeLaOscuridad-msi
+          path: TitanesDeLaOscuridad/src-tauri/target/release/bundle/msi/*.msi
+      - name: Publish Release with MSI
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v${{ github.run_number }}
+          name: TitanesDeLaOscuridad v${{ github.run_number }}
+          files: |
+            TitanesDeLaOscuridad-setup.msi
