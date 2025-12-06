@@ -20,7 +20,7 @@
   "bundle": {
     "targets": ["msi"],
     "windows": {
-      "webviewInstallMode": "embedBootstrapper"
+      "webviewInstallMode": "offlineInstaller"
     }
   }
 }
